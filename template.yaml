@@ -84,13 +84,14 @@ Resources:
           HOST: !GetAtt MyDB.Endpoint.Address
           USER: test
           PASSWORD: Password1!
-          DATABASEABLE_NAME: test
+          DATABASE: test
       Events:
         HelloWorldAPI:
           Type: Api 
           Properties:
             Path: /showtables
             Method: get
+
   MyDBSubnetGroup: 
     Properties: 
       DBSubnetGroupDescription: description
