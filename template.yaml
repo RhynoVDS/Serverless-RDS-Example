@@ -42,12 +42,14 @@ Resources:
     Properties: 
       GroupDescription: This is a group for lambda function
       GroupName: LambdaSecurityGroup
+      VpcId: !Ref VPC
 
   RDSSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties: 
       GroupDescription: This is a security group for RDS
       GroupName: RDSSecurityGroup
+      VpcId: !Ref VPC
 
   RDSSecurityGroupSSHinbound:
     Type: AWS::EC2::SecurityGroupIngress
@@ -89,8 +91,16 @@ Resources:
           Properties:
             Path: /showtables
             Method: get
+  MyDBSubnetGroup: 
+    Properties: 
+      DBSubnetGroupDescription: description
+      SubnetIds: 
+        - !Ref SubnetA
+        - !Ref SubnetB
+    Type: "AWS::RDS::DBSubnetGroup"
 
   MyDB: 
+    Type: "AWS::RDS::DBInstance"
     DeletionPolicy: Snapshot
     Properties: 
       AllocatedStorage: "100"
@@ -102,16 +112,7 @@ Resources:
       DBSubnetGroupName: !Ref MyDBSubnetGroup
       MasterUsername: test
       VPCSecurityGroups: 
-        - !Ref RDSSecurityGroup
-    Type: "AWS::RDS::DBInstance"
-
-  MyDBSubnetGroup: 
-    Properties: 
-      DBSubnetGroupDescription: description
-      SubnetIds: 
-        - !Ref SubnetA
-        - !Ref SubnetB
-    Type: "AWS::RDS::DBSubnetGroup"
+        - !GetAtt RDSSecurityGroup.GroupId
 
 Outputs:
   HelloWorldApi:
