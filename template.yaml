@@ -60,7 +60,7 @@ Resources:
       ToPort: 3306
       CidrIp: 0.0.0.0/0
 
-  SQLQuery:
+  Setup_Customer_Table:
     Type: AWS::Serverless::Function 
     Properties:
       CodeUri: code/
@@ -89,8 +89,73 @@ Resources:
         HelloWorldAPI:
           Type: Api 
           Properties:
-            Path: /showtables
+            Path: /setup
             Method: get
+
+  Query_Customer_Table:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: code/
+      Handler: sql.setup
+      Runtime: nodejs8.10
+      Policies:
+      - AWSLambdaExecute # Managed Policy
+      - Version: '2012-10-17' # Policy Document
+        Statement:
+          - Effect: Allow
+            Action: '*'
+            Resource: '*'
+      VpcConfig:
+        SubnetIds:
+          - Ref: SubnetA
+          - Ref: SubnetB
+        SecurityGroupIds:
+          - Ref: LambdaSecurityGroup
+      Environment:
+        Variables:
+          HOST: !GetAtt MyDB.Endpoint.Address
+          USER: test
+          PASSWORD: Password1!
+          DATABASE: test
+      Events:
+        HelloWorldAPI:
+          Type: Api 
+          Properties:
+            Path: /query
+            Method: get
+
+  Insert_Customer_Table:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: code/
+      Handler: sql.insert
+      Runtime: nodejs8.10
+      Policies:
+      - AWSLambdaExecute # Managed Policy
+      - Version: '2012-10-17' # Policy Document
+        Statement:
+          - Effect: Allow
+            Action: '*'
+            Resource: '*'
+      VpcConfig:
+        SubnetIds:
+          - Ref: SubnetA
+          - Ref: SubnetB
+        SecurityGroupIds:
+          - Ref: LambdaSecurityGroup
+      Environment:
+        Variables:
+          HOST: !GetAtt MyDB.Endpoint.Address
+          USER: test
+          PASSWORD: Password1!
+          DATABASE: test
+      Events:
+        HelloWorldAPI:
+          Type: Api 
+          Properties:
+            Path: /insert
+            Method: post
+
 
   MyDBSubnetGroup: 
     Properties: 
