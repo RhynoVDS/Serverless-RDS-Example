@@ -9,6 +9,12 @@ Globals:
   Function:
     Timeout: 3
 
+Parameters:
+  check:
+    Type: String
+    Description: The domain for the ALB
+    Default: test
+
 Resources: 
 
   VPC:
@@ -60,39 +66,7 @@ Resources:
       ToPort: 3306
       CidrIp: 0.0.0.0/0
 
-  Setup_Customer_Table:
-    Type: AWS::Serverless::Function 
-    Properties:
-      CodeUri: code/
-      Handler: sql.handler
-      Runtime: nodejs8.10
-      Policies:
-      - AWSLambdaExecute # Managed Policy
-      - Version: '2012-10-17' # Policy Document
-        Statement:
-          - Effect: Allow
-            Action: '*'
-            Resource: '*'
-      VpcConfig:
-        SubnetIds:
-          - Ref: SubnetA
-          - Ref: SubnetB
-        SecurityGroupIds:
-          - Ref: LambdaSecurityGroup
-      Environment:
-        Variables:
-          HOST: !GetAtt MyDB.Endpoint.Address
-          USER: test
-          PASSWORD: Password1!
-          DATABASE: test
-      Events:
-        HelloWorldAPI:
-          Type: Api 
-          Properties:
-            Path: /setup
-            Method: get
-
-  Query_Customer_Table:
+  SetupCustomerTable:
     Type: AWS::Serverless::Function 
     Properties:
       CodeUri: code/
@@ -121,10 +95,42 @@ Resources:
         HelloWorldAPI:
           Type: Api 
           Properties:
+            Path: /setup
+            Method: get
+
+  QueryCustomerTable:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: code/
+      Handler: sql.query
+      Runtime: nodejs8.10
+      Policies:
+      - AWSLambdaExecute # Managed Policy
+      - Version: '2012-10-17' # Policy Document
+        Statement:
+          - Effect: Allow
+            Action: '*'
+            Resource: '*'
+      VpcConfig:
+        SubnetIds:
+          - Ref: SubnetA
+          - Ref: SubnetB
+        SecurityGroupIds:
+          - Ref: LambdaSecurityGroup
+      Environment:
+        Variables:
+          HOST: !GetAtt MyDB.Endpoint.Address
+          USER: test
+          PASSWORD: Password1!
+          DATABASE: test
+      Events:
+        HelloWorldAPI:
+          Type: Api 
+          Properties:
             Path: /query
             Method: get
 
-  Insert_Customer_Table:
+  InsertCustomerTable:
     Type: AWS::Serverless::Function 
     Properties:
       CodeUri: code/
