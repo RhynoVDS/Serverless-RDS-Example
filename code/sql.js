@@ -1,10 +1,3 @@
-var mysql = require('mysql');
-var con = mysql.createConnection({
-    host:  process.env.HOST,
-    user: process.env.USER,
-    password: process.env.PASSWORD, 
-    database: process.env.DATABASE
-});
 exports.setup = (event, context, callback) => {
     
     console.log("Connected!");
@@ -24,20 +17,26 @@ exports.setup = (event, context, callback) => {
 };
 
 exports.query = (event, context, callback) => {
+    var mysql = require('mysql');
+    var con = mysql.createConnection({
+        host:  process.env.HOST,
+        user: process.env.USER,
+        password: process.env.PASSWORD, 
+        database: process.env.DATABASE
+    });
 
     con.query("SELECT * FROM customers", function (err, result, fields) {
-
+        
         console.log(result);
         var response = {
             statusCode: 200,
             body: JSON.stringify(result)
         }
 
-        con.end();
         callback(err,JSON.stringify(response))
+        con.end();
     });
 }
-
 exports.insert = (event, context, callback) => {
     con.connect(function(err) {
         
