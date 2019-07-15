@@ -9,12 +9,6 @@ Globals:
   Function:
     Timeout: 3
 
-Parameters:
-  check:
-    Type: String
-    Description: The domain for the ALB
-    Default: test
-
 Resources: 
 
   VPC:
